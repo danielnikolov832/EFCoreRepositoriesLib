@@ -105,9 +105,9 @@ public abstract class CrudRepositoryWithPKBase<TPrimaryKeyUser, TInsert, TUpdate
     {
     }
 
-    public abstract TPrimaryKeyUser Insert(TInsert model);
+    public abstract TPrimaryKeyUser Insert(TInsert insert);
 
-    public abstract void Update(TUpdate model);
+    public abstract void Update(TUpdate update);
 
     public virtual void Remove(TPrimaryKeyUser model)
     {

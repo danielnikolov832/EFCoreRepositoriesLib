@@ -1,5 +1,4 @@
-﻿using FluentQuery;
-using FluentQuery.Core;
+﻿using FluentQuery.Core;
 using FluentQuery.SQLSupport;
 
 namespace EFCoreRepositoriesLib;
@@ -31,10 +30,10 @@ public interface ICrudRepositoryWithPKCommon<TPrimaryKeyUser> : IRepositoryWithP
 public interface ICrudRepositoryWithPKCommon<TPrimaryKeyUser, TInsert, TUpdate> : IRepositoryWithPKCommon<TPrimaryKeyUser>
     where TPrimaryKeyUser : PrivatePrimaryKeyUser
 {
-    TPrimaryKeyUser Insert(TInsert model);
+    TPrimaryKeyUser Insert(TInsert insert);
     bool Remove(int id);
     void Remove(TPrimaryKeyUser model);
-    void Update(TUpdate model);
+    void Update(TUpdate update);
 }
 
 public interface IRepositoryWithPKBase<TPrimaryKeyUser> : IRepositoryWithPKCommon<TPrimaryKeyUser>
@@ -42,6 +41,7 @@ public interface IRepositoryWithPKBase<TPrimaryKeyUser> : IRepositoryWithPKCommo
 {
     List<TPrimaryKeyUser> GetAll(QueryForSQLBase<TPrimaryKeyUser> query);
 }
+
 public interface ICrudRepositoryWithPKBase<TPrimaryKeyUser> : IRepositoryWithPKBase<TPrimaryKeyUser>, ICrudRepositoryWithPKCommon<TPrimaryKeyUser>
     where TPrimaryKeyUser : ReadOnlyPrimaryKeyUser
 {

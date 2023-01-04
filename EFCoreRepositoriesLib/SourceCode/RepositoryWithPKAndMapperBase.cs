@@ -169,9 +169,9 @@ public abstract class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TP
     {
     }
 
-    public abstract TPrimaryKeyUserModel Insert(TInsert model);
+    public abstract TPrimaryKeyUserModel Insert(TInsert insert);
 
-    public abstract void Update(TUpdate model);
+    public abstract void Update(TUpdate update);
 
     public virtual void Remove(TPrimaryKeyUserModel model)
     {
