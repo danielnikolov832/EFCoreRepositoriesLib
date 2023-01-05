@@ -10,10 +10,15 @@ namespace EFCoreRepositoriesLib.FluentValidation;
 
 internal static class ValidationStaticLib
 {
+    internal static IValidator<T>? GetCurrentValidator<T>(IValidator<T>? defaultValidator = null, IValidator<T>? currentValidator = null)
+    {
+        return currentValidator ?? defaultValidator;
+    }
+
     internal static bool Validate<T>(Action<ValidationResult, IValidator<T>, T> handleFailAction,
         T objectToValidate, IValidator<T>? defaultValidator = null, IValidator<T>? currentValidator = null)
     {
-        IValidator<T>? validator = currentValidator ?? defaultValidator;
+        IValidator<T>? validator = GetCurrentValidator(defaultValidator, currentValidator);
 
         if (validator is null) return true;
 
@@ -22,6 +27,25 @@ internal static class ValidationStaticLib
         if (!result.IsValid)
         {
             handleFailAction(result, validator, objectToValidate);
+        }
+
+        return result.IsValid;
+    }
+
+    internal static bool Validate<T>(Action<ValidationResult, IValidator<T>, T> handleFailAction,
+        Action<ValidationResult, IValidator<T>, T>? injectedHandleFailAction,
+        T objectToValidate, IValidator<T>? defaultValidator = null, IValidator<T>? currentValidator = null)
+    {
+        IValidator<T>? validator = GetCurrentValidator(defaultValidator, currentValidator);
+
+        if (validator is null) return true;
+
+        ValidationResult result = validator.Validate(objectToValidate);
+
+        if (!result.IsValid)
+        {
+            handleFailAction(result, validator, objectToValidate);
+            injectedHandleFailAction?.Invoke(result, validator, objectToValidate);
         }
 
         return result.IsValid;
