@@ -19,11 +19,13 @@ public class CrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser> : CrudReposi
 
     private readonly IValidator<TPrimaryKeyUser> _defaultValidator;
 
-    private bool ValidateModel(TPrimaryKeyUser objectToValidate, IValidator<TPrimaryKeyUser>? currentValidator = null) => ValidationStaticLib.Validate(HandleValidationOnModelFail, objectToValidate, _defaultValidator, currentValidator);
+    public Action<ValidationResult, IValidator<TPrimaryKeyUser>, TPrimaryKeyUser>? getset_handleValidationOnModelFail { get; set; }
+
+    private bool ValidateModel(TPrimaryKeyUser objectToValidate, IValidator<TPrimaryKeyUser>? currentValidator = null) => ValidationStaticLib.Validate(HandleValidationOnModelFail, getset_handleValidationOnModelFail, objectToValidate, _defaultValidator, currentValidator);
 
     protected virtual void HandleValidationOnModelFail(ValidationResult result, IValidator<TPrimaryKeyUser> validator, TPrimaryKeyUser validatedObject)
     {
-        ValidationStaticLib.DefaultResultFail(result);
+        ValidationStaticLib.DefaultResultFail(result, validator, validatedObject);
     }
 
     public override void Insert(TPrimaryKeyUser model)
@@ -81,26 +83,26 @@ public abstract class CrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser, TIn
     private readonly IValidator<TInsert>? _defaultInsertValidator;
     private readonly IValidator<TUpdate>? _defaultUpdateValidator;
 
-    public Action<ValidationResult, IValidator<TPrimaryKeyUser>, TPrimaryKeyUser>? set_handleValidationOnModelFail { private get; set; }
-    public Action<ValidationResult, IValidator<TInsert>, TInsert>? set_handleValidationOnInsertFail { private get; set; }
-    public Action<ValidationResult, IValidator<TUpdate>, TUpdate>? set_handleValidationOnUpdateFail { private get; set; }
+    public Action<ValidationResult, IValidator<TPrimaryKeyUser>, TPrimaryKeyUser>? getset_handleValidationOnModelFail { get; set; }
+    public Action<ValidationResult, IValidator<TInsert>, TInsert>? getset_handleValidationOnInsertFail { get; set; }
+    public Action<ValidationResult, IValidator<TUpdate>, TUpdate>? getset_handleValidationOnUpdateFail { get; set; }
 
-    private bool ValidateInsert(TInsert objectToValidate, IValidator<TInsert>? currentValidator = null) => ValidationStaticLib.Validate(HandleValidationOnInsertFail, set_handleValidationOnInsertFail, objectToValidate, _defaultInsertValidator, currentValidator);
-    private bool ValidateUpdate(TUpdate objectToValidate, IValidator<TUpdate>? currentValidator = null) => ValidationStaticLib.Validate(HandleValidationOnUpdateFail, set_handleValidationOnUpdateFail, objectToValidate, _defaultUpdateValidator, currentValidator);
+    private bool ValidateInsert(TInsert objectToValidate, IValidator<TInsert>? currentValidator = null) => ValidationStaticLib.Validate(HandleValidationOnInsertFail, HandleValidationOnInsertFail, objectToValidate, _defaultInsertValidator, currentValidator);
+    private bool ValidateUpdate(TUpdate objectToValidate, IValidator<TUpdate>? currentValidator = null) => ValidationStaticLib.Validate(HandleValidationOnUpdateFail, HandleValidationOnUpdateFail, objectToValidate, _defaultUpdateValidator, currentValidator);
 
     protected virtual void HandleValidationOnModelFail(ValidationResult result, IValidator<TPrimaryKeyUser> validator, TPrimaryKeyUser validatedObject)
     {
-        ValidationStaticLib.DefaultResultFail(result);
+        ValidationStaticLib.DefaultResultFail(result, validator, validatedObject);
     }
 
     protected virtual void HandleValidationOnInsertFail(ValidationResult result, IValidator<TInsert> validator, TInsert validatedObject)
     {
-        ValidationStaticLib.DefaultResultFail(result);
+        ValidationStaticLib.DefaultResultFail(result, validator, validatedObject);
     }
 
     protected virtual void HandleValidationOnUpdateFail(ValidationResult result, IValidator<TUpdate> validator, TUpdate validatedObject)
     {
-        ValidationStaticLib.DefaultResultFail(result);
+        ValidationStaticLib.DefaultResultFail(result, validator, validatedObject);
     }
 
     private IValidator<TPrimaryKeyUser>? GetValidator(IValidator<TPrimaryKeyUser>? currentModelValidator)
@@ -108,7 +110,7 @@ public abstract class CrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser, TIn
         return ValidationStaticLib.GetCurrentValidator(_defaultModelValidator, currentModelValidator);
     }
 
-    public virtual TPrimaryKeyUser Insert(TInsert insert, IValidator<TInsert>? currentInsertValidator = null, IValidator<TPrimaryKeyUser>? currentModelValidator = null)
+    public virtual TPrimaryKeyUser? TryInsert(TInsert insert, IValidator<TInsert>? currentInsertValidator = null, IValidator<TPrimaryKeyUser>? currentModelValidator = null)
     {
         bool isValidModel = ValidateInsert(insert, currentInsertValidator);
 
@@ -117,7 +119,13 @@ public abstract class CrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser, TIn
             return InsertInternal(insert, GetValidator(currentModelValidator));
         }
 
-        throw new ValidationException($"Model {nameof(insert)} is invalid");
+        return null;
+    }
+
+    public virtual TPrimaryKeyUser Insert(TInsert insert, IValidator<TInsert>? currentInsertValidator = null, IValidator<TPrimaryKeyUser>? currentModelValidator = null)
+    {
+        return TryInsert(insert, currentInsertValidator, currentModelValidator) ??
+            throw new ValidationException($"Argument {insert} is invalid, or there was an invalidation of a model in the InsertInternal method");
     }
 
     public override TPrimaryKeyUser Insert(TInsert insert)
@@ -125,13 +133,13 @@ public abstract class CrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser, TIn
         return Insert(insert, null, null);
     }
 
-    public virtual void Update(TUpdate model, IValidator<TUpdate>? currentUpdateValidator = null, IValidator<TPrimaryKeyUser>? currentModelValidator = null)
+    public virtual void Update(TUpdate update, IValidator<TUpdate>? currentUpdateValidator = null, IValidator<TPrimaryKeyUser>? currentModelValidator = null)
     {
-        bool isValidModel = ValidateUpdate(model, currentUpdateValidator);
+        bool isValidModel = ValidateUpdate(update, currentUpdateValidator);
 
         if (isValidModel)
         {
-            UpdateInternal(model, GetValidator(currentModelValidator));
+            UpdateInternal(update, GetValidator(currentModelValidator));
         }
     }
 
@@ -140,6 +148,6 @@ public abstract class CrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser, TIn
         Update(update, null, null);
     }
 
-    protected abstract TPrimaryKeyUser InsertInternal(TInsert insert, IValidator<TPrimaryKeyUser>? modelValidator = null);
+    protected abstract TPrimaryKeyUser? InsertInternal(TInsert insert, IValidator<TPrimaryKeyUser>? modelValidator = null);
     protected abstract void UpdateInternal(TUpdate update, IValidator<TPrimaryKeyUser>? modelValidator = null);
 }

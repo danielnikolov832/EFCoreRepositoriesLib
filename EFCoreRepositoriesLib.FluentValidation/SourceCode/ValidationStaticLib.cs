@@ -44,8 +44,8 @@ internal static class ValidationStaticLib
 
         if (!result.IsValid)
         {
-            handleFailAction(result, validator, objectToValidate);
             injectedHandleFailAction?.Invoke(result, validator, objectToValidate);
+            handleFailAction(result, validator, objectToValidate);
         }
 
         return result.IsValid;
@@ -70,7 +70,9 @@ internal static class ValidationStaticLib
         return (isValidDao, entity);
     }
 
-    internal static void DefaultResultFail(ValidationResult result)
+#pragma warning disable IDE0060 // Remove unused parameter
+    internal static void DefaultResultFail<T>(ValidationResult result, IValidator<T> validator, T validatedObject)
+#pragma warning restore IDE0060 // Remove unused parameter
     {
         throw new ValidationException(result.Errors);
     }
