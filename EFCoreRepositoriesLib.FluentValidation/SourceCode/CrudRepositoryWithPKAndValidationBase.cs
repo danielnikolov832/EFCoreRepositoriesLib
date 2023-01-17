@@ -28,22 +28,31 @@ public class CrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser> : CrudReposi
         ValidationStaticLib.DefaultResultFail(result, validator, validatedObject);
     }
 
-    public override void Insert(TPrimaryKeyUser model)
+    public bool TryInsert(TPrimaryKeyUser model, IValidator<TPrimaryKeyUser>? currentModelValidator = null)
     {
-        bool isValidModel = ValidateModel(model);
+        bool isValidModel = ValidateModel(model, currentModelValidator);
 
         if (isValidModel)
         {
             base.Insert(model);
         }
+
+        return isValidModel;
     }
+
+    public override void Insert(TPrimaryKeyUser model)
+    {
+        if(!TryInsert(model))
+        {
+            throw new ValidationException($"Argument {model} is invalid");
+        }
+    }
+
     public void Insert(TPrimaryKeyUser model, IValidator<TPrimaryKeyUser> currentValidator)
     {
-        bool isValidModel = ValidateModel(model, currentValidator);
-
-        if (isValidModel)
+        if (!TryInsert(model, currentValidator))
         {
-            base.Insert(model);
+            throw new ValidationException($"Argument {model} is invalid");
         }
     }
 

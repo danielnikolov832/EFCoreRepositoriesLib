@@ -47,15 +47,25 @@ public class CrudRepositoryWithPKAndMapperAndValidationBase<TPrimaryKeyUserModel
         return ValidationStaticLib.ValidateModelAndDao(model, ValidateModel, ValidateDAO, Adapt, currentModelValidator, currentDaoValidator);
     }
 
-    public virtual void Insert(TPrimaryKeyUserModel model, IValidator<TPrimaryKeyUserModel>? currentModelValidator = null, IValidator<TPrimaryKeyUserDAO>? currentDaoValidator = null)
+    public virtual bool TryInsert(TPrimaryKeyUserModel model, IValidator<TPrimaryKeyUserModel>? currentModelValidator = null, IValidator<TPrimaryKeyUserDAO>? currentDaoValidator = null)
     {
         (bool isValidModel, TPrimaryKeyUserDAO? entity) = ValidateModelAndDAO(model, currentModelValidator, currentDaoValidator);
 
-        if (!isValidModel || entity is null) return;
+        if (!isValidModel || entity is null) return false;
 
         _table.Add(entity);
 
         _dbContext.SaveChanges();
+
+        return true;
+    }
+
+    public virtual void Insert(TPrimaryKeyUserModel model, IValidator<TPrimaryKeyUserModel>? currentModelValidator = null, IValidator<TPrimaryKeyUserDAO>? currentDaoValidator = null)
+    {
+        if(!TryInsert(model, currentModelValidator, currentDaoValidator))
+        {
+            throw new ValidationException("There was an invalidation of a model in the InsertInternal method");
+        }
     }
 
     public override void Insert(TPrimaryKeyUserModel model)
@@ -130,16 +140,6 @@ public abstract class CrudRepositoryWithPKAndMapperAndValidationBase<TPrimaryKey
         ValidationStaticLib.DefaultResultFail(result, validator, validatedObject);
     }
 
-    private IValidator<TPrimaryKeyUserModel>? GetModelValidator(IValidator<TPrimaryKeyUserModel>? currentModelValidator = null)
-    {
-        return currentModelValidator ?? _defaultIModelValidator;
-    }
-
-    private IValidator<TPrimaryKeyUserDAO>? GetDaoValidator(IValidator<TPrimaryKeyUserDAO>? currentModelValidator = null)
-    {
-        return currentModelValidator ?? _defaultDaoValidator;
-    }
-
     public virtual TPrimaryKeyUserModel? TryInsert(TInsert insert, IValidator<TInsert>? currentInsertValidator = null,
         IValidator<TPrimaryKeyUserModel>? currentModelValidator = null, IValidator<TPrimaryKeyUserDAO>? currentDaoValidator = null)
     {
@@ -147,7 +147,7 @@ public abstract class CrudRepositoryWithPKAndMapperAndValidationBase<TPrimaryKey
 
         if (isValidModel)
         {
-            return InsertInternal(insert, GetModelValidator(currentModelValidator), GetDaoValidator(currentDaoValidator));
+            return InsertInternal(insert, ValidationStaticLib.GetCurrentValidator(currentModelValidator, _defaultIModelValidator), ValidationStaticLib.GetCurrentValidator(currentDaoValidator, _defaultDaoValidator));
         }
 
         return null;
@@ -172,7 +172,7 @@ public abstract class CrudRepositoryWithPKAndMapperAndValidationBase<TPrimaryKey
 
         if (isValidModel)
         {
-            UpdateInternal(update, GetModelValidator(currentModelValidator), GetDaoValidator(currentDaoValidator));
+            UpdateInternal(update, ValidationStaticLib.GetCurrentValidator(currentModelValidator, _defaultIModelValidator), ValidationStaticLib.GetCurrentValidator(currentDaoValidator, _defaultDaoValidator));
         }
     }
 
