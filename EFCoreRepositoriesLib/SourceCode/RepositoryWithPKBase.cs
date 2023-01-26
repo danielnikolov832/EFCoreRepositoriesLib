@@ -28,20 +28,12 @@ public class RepositoryWithPKBase<TPrimaryKeyUser> : IRepositoryWithPKBase<TPrim
 
     public virtual List<TPrimaryKeyUser> GetAll(QueryForSQLBase<TPrimaryKeyUser> query)
     {
-        Expression<Func<TPrimaryKeyUser, bool>> predicate = QueryToExpression.QueryToExp(query);
-
-        IEnumerable<TPrimaryKeyUser> filteredTable = _table.AsExpandableEFCore().ApplyTransformations(this).Where(predicate.Compile());
-
-        return filteredTable.ToList();
+        return _table.Query(query, this).ToList();
     }
 
     public virtual List<TPrimaryKeyUser> GetAll(IQuery<TPrimaryKeyUser> query)
     {
-        Expression<Func<TPrimaryKeyUser, bool>> predicate = QueryToExpression.QueryToExp(query);
-
-        IEnumerable<TPrimaryKeyUser> filteredTable = _table.AsExpandableEFCore().ApplyTransformations(this).Where(predicate.Compile());
-
-        return filteredTable.ToList();
+        return _table.Query(query, this).ToList();
     }
 
     public virtual TPrimaryKeyUser? GetById(int id)

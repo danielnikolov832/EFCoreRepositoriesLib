@@ -3,7 +3,7 @@ using FluentQuery.SQLSupport;
 
 namespace EFCoreRepositoriesLib;
 
-internal interface IRepositoryWithTransformations<TPrimaryKeyUser>
+public interface IRepositoryWithTransformations<TPrimaryKeyUser>
         where TPrimaryKeyUser : ReadOnlyPrimaryKeyUser
 {
     IQueryable<TPrimaryKeyUser> ApplyTransformations(IQueryable<TPrimaryKeyUser> entities);

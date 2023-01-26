@@ -23,15 +23,6 @@ public abstract class RepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrima
     protected readonly DbContext _dbContext;
     protected readonly IMapper _mapper;
 
-    protected IQueryable<TPrimaryKeyUserDAO> ApplyTransformationsBase(IQueryable<TPrimaryKeyUserDAO> entities)
-    {
-        ApplyTransformations(entities);
-
-        return entities;
-    }
-
-    public virtual IQueryable<TPrimaryKeyUserDAO> ApplyTransformations(IQueryable<TPrimaryKeyUserDAO> entities) => entities;
-
     protected TPrimaryKeyUserModel Adapt(TPrimaryKeyUserDAO dao)
     {
         return _mapper.Map<TPrimaryKeyUserDAO, TPrimaryKeyUserModel>(dao);
@@ -74,9 +65,7 @@ public abstract class RepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrima
 
     public virtual List<TPrimaryKeyUserModel> GetAll(QueryForSQLBase<TPrimaryKeyUserDAO> query)
     {
-        Expression<Func<TPrimaryKeyUserDAO, bool>> predicate = QueryToExpression.QueryToExp(query);
-
-        IEnumerable<TPrimaryKeyUserDAO> filteredTable = _table.AsExpandableEFCore().ApplyTransformations(this).Where(predicate.Compile());
+        IEnumerable<TPrimaryKeyUserDAO> filteredTable = _table.Query(query, this);
 
         IEnumerable<TPrimaryKeyUserModel> output = from TPrimaryKeyUserDAO dao in filteredTable
                                                    select Adapt(dao);
@@ -86,9 +75,7 @@ public abstract class RepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrima
 
     public virtual List<TPrimaryKeyUserModel> GetAll(IQuery<TPrimaryKeyUserDAO> query)
     {
-        Expression<Func<TPrimaryKeyUserDAO, bool>> predicate = QueryToExpression.QueryToExp(query);
-
-        IEnumerable<TPrimaryKeyUserDAO> filteredTable = _table.AsExpandableEFCore().ApplyTransformations(this).Where(predicate.Compile());
+        IEnumerable<TPrimaryKeyUserDAO> filteredTable = _table.Query(query, this);
 
         IEnumerable<TPrimaryKeyUserModel> output = from TPrimaryKeyUserDAO dao in filteredTable
                                                    select Adapt(dao);
@@ -104,6 +91,8 @@ public abstract class RepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrima
 
         return Adapt(entity);
     }
+
+    public virtual IQueryable<TPrimaryKeyUserDAO> ApplyTransformations(IQueryable<TPrimaryKeyUserDAO> entities) => entities;
 }
 
 public class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO> : RepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO>,
