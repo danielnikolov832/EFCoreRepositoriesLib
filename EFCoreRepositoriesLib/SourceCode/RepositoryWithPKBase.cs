@@ -117,9 +117,7 @@ public abstract class CrudRepositoryWithPKBase<TPrimaryKeyUser, TInsert, TUpdate
             return false;
         }
 
-        _table.Remove(model);
-
-        _dbContext.SaveChanges();
+        Remove(model);
 
         return true;
     }
