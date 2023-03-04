@@ -148,6 +148,45 @@ public class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKey
     }
 }
 
+public abstract class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TInsert, TUpdate> : RepositoryWithPKBase<TPrimaryKeyUserModel>,
+    ICrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TInsert, TUpdate>
+        where TPrimaryKeyUserModel : ReadOnlyPrimaryKeyUser
+{
+    protected CrudRepositoryWithPKAndMapperBase(DbContext dbContext, IMapper mapper) : base(dbContext)
+    {
+        _mapper = mapper;
+    }
+
+    protected readonly IMapper _mapper;
+
+    public abstract TPrimaryKeyUserModel Insert(TInsert insert);
+
+    public abstract void Update(TUpdate update);
+
+    public virtual void Remove(TPrimaryKeyUserModel model)
+    {
+        _table.Remove(model);
+
+        _dbContext.SaveChanges();
+    }
+
+    public virtual bool Remove(int id)
+    {
+        TPrimaryKeyUserModel? model = _table.Find(id);
+
+        if (model is null)
+        {
+            return false;
+        }
+
+        _table.Remove(model);
+
+        _dbContext.SaveChanges();
+
+        return true;
+    }
+}
+
 public abstract class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO, TInsert, TUpdate> : RepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO>,
     ICrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO, TInsert, TUpdate>,
     ICrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TInsert, TUpdate>
