@@ -4,15 +4,14 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>EFCoreRepositoriesLib.FluentValidation</Title>
+    <Description>A library that contains repositories for accessing and modifying data in Microsoft.EntityFrameworkCore contexts extended from the EFCoreRepositoriesLib package. This package provides additional data validation capabilities built-in at any step of the data access process.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.4.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\EFCoreRepositoriesLib\EFCoreRepositoriesLib.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.3" />
   </ItemGroup>
 
 </Project>

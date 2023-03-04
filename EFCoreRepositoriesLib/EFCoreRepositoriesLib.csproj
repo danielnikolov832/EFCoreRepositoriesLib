@@ -4,17 +4,17 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>EFCoreRepositoriesLib</Title>
+    <Description>A library defining basic repositories for accessing and modifying records in Microsoft.EntityFrameworkCore</Description>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentQuery.Core" Version="1.0.0" />
+    <PackageReference Include="FluentQuery.SQLSupport" Version="1.0.0" />
     <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="7.1.3" />
     <PackageReference Include="Mapster" Version="7.3.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\FluentQuery\FluentQuery.Core\FluentQuery.Core.csproj" />
-    <ProjectReference Include="..\..\FluentQuery\FluentQuery.SQLSupport\FluentQuery.SQLSupport.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.3" />
   </ItemGroup>
 
 </Project>
