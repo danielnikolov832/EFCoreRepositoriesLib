@@ -10,9 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EFCoreRepositoriesLib" Version="1.0.0" />
     <PackageReference Include="FluentValidation" Version="11.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EFCoreRepositoriesLib\EFCoreRepositoriesLib.csproj" />
   </ItemGroup>
 
 </Project>
