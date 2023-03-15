@@ -1,16 +1,14 @@
 ﻿using FluentQuery.Core;
 using FluentQuery.SQLSupport;
-using LinqKit;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace EFCoreRepositoriesLib;
 
 public abstract class RepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO> : IRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO>,
     IRepositoryWithTransformations<TPrimaryKeyUserDAO>
-    where TPrimaryKeyUserModel : PrivatePrimaryKeyUser
-    where TPrimaryKeyUserDAO : PublicPrimaryKeyUser
+    where TPrimaryKeyUserModel : IPrivatePrimaryKeyUser
+    where TPrimaryKeyUserDAO :  class, IPublicPrimaryKeyUser
 {
     protected RepositoryWithPKAndMapperBase(DbContext dbContext, IMapper mapper)
     {
@@ -19,8 +17,8 @@ public abstract class RepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrima
         _mapper = mapper;
     }
 
-    protected readonly DbSet<TPrimaryKeyUserDAO> _table;
-    protected readonly DbContext _dbContext;
+    protected internal readonly DbSet<TPrimaryKeyUserDAO> _table;
+    protected internal readonly DbContext _dbContext;
     protected readonly IMapper _mapper;
 
     protected TPrimaryKeyUserModel Adapt(TPrimaryKeyUserDAO dao)
@@ -87,7 +85,7 @@ public abstract class RepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrima
     {
         TPrimaryKeyUserDAO? entity = _table.ApplyTransformations(this).First(x => x.ID == id);
 
-        if (entity is null) return null;
+        if (entity is null) return default;
 
         return Adapt(entity);
     }
@@ -97,8 +95,8 @@ public abstract class RepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrima
 
 public class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO> : RepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO>,
     ICrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO>
-        where TPrimaryKeyUserModel : PrivatePrimaryKeyUser
-        where TPrimaryKeyUserDAO : PublicPrimaryKeyUser
+        where TPrimaryKeyUserModel : IPrivatePrimaryKeyUser
+        where TPrimaryKeyUserDAO : class, IPublicPrimaryKeyUser
 {
     public CrudRepositoryWithPKAndMapperBase(DbContext dbContext, IMapper mapper) : base(dbContext, mapper)
     {
@@ -108,27 +106,21 @@ public class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKey
     {
         TPrimaryKeyUserDAO entity = Adapt(model);
 
-        _table.Add(entity);
-
-        _dbContext.SaveChanges();
+        this.AddToTableAndSaveChanges(entity);
     }
 
     public virtual void Update(TPrimaryKeyUserModel model)
     {
         TPrimaryKeyUserDAO entity = Adapt(model);
 
-        _table.Update(entity);
-
-        _dbContext.SaveChanges();
+        this.UpdateTableAndSaveChanges(entity);
     }
 
     public virtual void Remove(TPrimaryKeyUserModel model)
     {
         TPrimaryKeyUserDAO entity = Adapt(model);
 
-        _table.Remove(entity);
-
-        _dbContext.SaveChanges();
+        this.RemoveFromTableAndSaveChanges(entity);
     }
 
     public virtual bool Remove(int id)
@@ -140,9 +132,7 @@ public class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKey
             return false;
         }
 
-        _table.Remove(model);
-
-        _dbContext.SaveChanges();
+        this.RemoveFromTableAndSaveChanges(model);
 
         return true;
     }
@@ -150,7 +140,7 @@ public class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKey
 
 public abstract class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TInsert, TUpdate> : RepositoryWithPKBase<TPrimaryKeyUserModel>,
     ICrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TInsert, TUpdate>
-        where TPrimaryKeyUserModel : ReadOnlyPrimaryKeyUser
+        where TPrimaryKeyUserModel : class, IReadOnlyPrimaryKeyUser
 {
     protected CrudRepositoryWithPKAndMapperBase(DbContext dbContext, IMapper mapper) : base(dbContext)
     {
@@ -165,9 +155,7 @@ public abstract class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TI
 
     public virtual void Remove(TPrimaryKeyUserModel model)
     {
-        _table.Remove(model);
-
-        _dbContext.SaveChanges();
+        this.RemoveFromTableAndSaveChanges(model);
     }
 
     public virtual bool Remove(int id)
@@ -179,9 +167,7 @@ public abstract class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TI
             return false;
         }
 
-        _table.Remove(model);
-
-        _dbContext.SaveChanges();
+        this.RemoveFromTableAndSaveChanges(model);
 
         return true;
     }
@@ -190,8 +176,8 @@ public abstract class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TI
 public abstract class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO, TInsert, TUpdate> : RepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO>,
     ICrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO, TInsert, TUpdate>,
     ICrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TInsert, TUpdate>
-        where TPrimaryKeyUserModel : PrivatePrimaryKeyUser
-        where TPrimaryKeyUserDAO : PublicPrimaryKeyUser
+        where TPrimaryKeyUserModel : IPrivatePrimaryKeyUser
+        where TPrimaryKeyUserDAO : class, IPublicPrimaryKeyUser
 {
     protected CrudRepositoryWithPKAndMapperBase(DbContext dbContext, IMapper mapper) : base(dbContext, mapper)
     {
@@ -205,9 +191,7 @@ public abstract class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TP
     {
         TPrimaryKeyUserDAO entity = Adapt(model);
 
-        _table.Remove(entity);
-
-        _dbContext.SaveChanges();
+        this.RemoveFromTableAndSaveChanges(entity);
     }
 
     public virtual bool Remove(int id)
@@ -219,9 +203,7 @@ public abstract class CrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TP
             return false;
         }
 
-        _table.Remove(model);
-
-        _dbContext.SaveChanges();
+        this.RemoveFromTableAndSaveChanges(model);
 
         return true;
     }

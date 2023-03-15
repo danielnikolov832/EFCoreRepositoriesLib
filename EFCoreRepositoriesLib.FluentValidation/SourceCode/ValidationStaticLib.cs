@@ -56,8 +56,8 @@ internal static class ValidationStaticLib
         Func<TPrimaryKeyUserDAO, IValidator<TPrimaryKeyUserDAO>?, bool> validateDaoAction,
         Func<TPrimaryKeyUserModel, TPrimaryKeyUserDAO> adaptAction,
         IValidator<TPrimaryKeyUserModel>? currentModelValidator = null, IValidator<TPrimaryKeyUserDAO>? currentDaoValidator = null)
-        where TPrimaryKeyUserModel : PrivatePrimaryKeyUser
-        where TPrimaryKeyUserDAO : PublicPrimaryKeyUser
+        where TPrimaryKeyUserModel : IPrivatePrimaryKeyUser
+        where TPrimaryKeyUserDAO : class, IPublicPrimaryKeyUser
     {
         bool isValidModel = validateModelAction(model, currentModelValidator);
 

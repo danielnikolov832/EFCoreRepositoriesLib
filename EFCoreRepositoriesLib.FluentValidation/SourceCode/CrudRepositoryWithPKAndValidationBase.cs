@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EFCoreRepositoriesLib.FluentValidation;
 
 public class CrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser> : CrudRepositoryWithPKBase<TPrimaryKeyUser>, ICrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser>
-    where TPrimaryKeyUser : ReadOnlyPrimaryKeyUser
+    where TPrimaryKeyUser : class, IReadOnlyPrimaryKeyUser
 {
     public CrudRepositoryWithPKAndValidationBase(DbContext dbContext, IValidator<TPrimaryKeyUser> defaultValidator) : base(dbContext)
     {
@@ -78,7 +78,7 @@ public class CrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser> : CrudReposi
 
 public abstract class CrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser, TInsert, TUpdate> : CrudRepositoryWithPKBase<TPrimaryKeyUser, TInsert, TUpdate>,
     ICrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser, TInsert, TUpdate>
-    where TPrimaryKeyUser : ReadOnlyPrimaryKeyUser
+    where TPrimaryKeyUser : class, IReadOnlyPrimaryKeyUser
 {
     protected CrudRepositoryWithPKAndValidationBase(DbContext dbContext, IValidator<TPrimaryKeyUser>? defaultModelValidator = null,
         IValidator<TInsert>? defaultInsertValidator = null, IValidator<TUpdate>? defaultUpdateValidator = null) : base(dbContext)

@@ -1,6 +1,5 @@
 ﻿using FluentQuery.Core;
 using FluentQuery.SQLSupport;
-using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
@@ -8,7 +7,7 @@ using System.Linq.Expressions;
 namespace EFCoreRepositoriesLib;
 
 public class RepositoryWithPKBase<TPrimaryKeyUser> : IRepositoryWithPKBase<TPrimaryKeyUser>, IRepositoryWithTransformations<TPrimaryKeyUser>
-    where TPrimaryKeyUser : ReadOnlyPrimaryKeyUser
+    where TPrimaryKeyUser : class, IReadOnlyPrimaryKeyUser
 {
     public RepositoryWithPKBase(DbContext dbContext)
     {
@@ -16,8 +15,8 @@ public class RepositoryWithPKBase<TPrimaryKeyUser> : IRepositoryWithPKBase<TPrim
         _dbContext = dbContext;
     }
 
-    protected readonly DbSet<TPrimaryKeyUser> _table;
-    protected readonly DbContext _dbContext;
+    protected internal readonly DbSet<TPrimaryKeyUser> _table;
+    protected internal readonly DbContext _dbContext;
 
     public virtual List<TPrimaryKeyUser> GetAll()
     {
@@ -45,7 +44,7 @@ public class RepositoryWithPKBase<TPrimaryKeyUser> : IRepositoryWithPKBase<TPrim
 }
 
 public class CrudRepositoryWithPKBase<TPrimaryKeyUserModel> : RepositoryWithPKBase<TPrimaryKeyUserModel>, ICrudRepositoryWithPKBase<TPrimaryKeyUserModel>
-    where TPrimaryKeyUserModel : ReadOnlyPrimaryKeyUser
+    where TPrimaryKeyUserModel : class, IReadOnlyPrimaryKeyUser
 {
     public CrudRepositoryWithPKBase(DbContext dbContext) : base(dbContext)
     {
@@ -53,23 +52,17 @@ public class CrudRepositoryWithPKBase<TPrimaryKeyUserModel> : RepositoryWithPKBa
 
     public virtual void Insert(TPrimaryKeyUserModel model)
     {
-        _table.Add(model);
-
-        _dbContext.SaveChanges();
+        this.AddToTableAndSaveChanges(model);
     }
 
     public virtual void Update(TPrimaryKeyUserModel model)
     {
-        _table.Update(model);
-
-        _dbContext.SaveChanges();
+        this.UpdateTableAndSaveChanges(model);
     }
 
     public virtual void Remove(TPrimaryKeyUserModel model)
     {
-        _table.Remove(model);
-
-        _dbContext.SaveChanges();
+        this.RemoveFromTableAndSaveChanges(model);
     }
 
     public virtual bool Remove(int id)
@@ -81,9 +74,7 @@ public class CrudRepositoryWithPKBase<TPrimaryKeyUserModel> : RepositoryWithPKBa
             return false;
         }
 
-        _table.Remove(model);
-
-        _dbContext.SaveChanges();
+        this.RemoveFromTableAndSaveChanges(model);
 
         return true;
     }
@@ -91,7 +82,7 @@ public class CrudRepositoryWithPKBase<TPrimaryKeyUserModel> : RepositoryWithPKBa
 
 public abstract class CrudRepositoryWithPKBase<TPrimaryKeyUser, TInsert, TUpdate> : RepositoryWithPKBase<TPrimaryKeyUser>,
     ICrudRepositoryWithPKBase<TPrimaryKeyUser, TInsert, TUpdate>
-    where TPrimaryKeyUser : ReadOnlyPrimaryKeyUser
+    where TPrimaryKeyUser : class, IReadOnlyPrimaryKeyUser
 {
     protected CrudRepositoryWithPKBase(DbContext dbContext) : base(dbContext)
     {
@@ -103,9 +94,7 @@ public abstract class CrudRepositoryWithPKBase<TPrimaryKeyUser, TInsert, TUpdate
 
     public virtual void Remove(TPrimaryKeyUser model)
     {
-        _table.Remove(model);
-
-        _dbContext.SaveChanges();
+        this.RemoveFromTableAndSaveChanges(model);
     }
 
     public virtual bool Remove(int id)

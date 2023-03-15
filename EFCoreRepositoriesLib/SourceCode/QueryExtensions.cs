@@ -30,7 +30,7 @@ public static class QueryExtensions
     }
 
     public static IEnumerable<T> Query<T>(this DbSet<T> table, IQuery<T> query, IRepositoryWithTransformations<T> repositoryWithTransformations)
-        where T : ReadOnlyPrimaryKeyUser
+        where T : class, IReadOnlyPrimaryKeyUser
     {
         Expression<Func<T, bool>> predicate = QueryToExpression.QueryToExp(query);
 
@@ -38,7 +38,7 @@ public static class QueryExtensions
     }
 
     public static IEnumerable<T> Query<T>(this DbSet<T> table, QueryForSQLBase<T> query, IRepositoryWithTransformations<T> repositoryWithTransformations)
-        where T : ReadOnlyPrimaryKeyUser
+        where T : class, IReadOnlyPrimaryKeyUser
     {
         Expression<Func<T, bool>> predicate = QueryToExpression.QueryToExp(query);
 

@@ -4,7 +4,7 @@ using FluentValidation.Results;
 namespace EFCoreRepositoriesLib.FluentValidation;
 
 public interface ICrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser> : ICrudRepositoryWithPKBase<TPrimaryKeyUser>
-    where TPrimaryKeyUser : ReadOnlyPrimaryKeyUser
+    where TPrimaryKeyUser : class, IReadOnlyPrimaryKeyUser
 {
     Action<ValidationResult, IValidator<TPrimaryKeyUser>, TPrimaryKeyUser>? getset_handleValidationOnModelFail { get; set; }
 
@@ -14,7 +14,7 @@ public interface ICrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser> : ICrud
 
 public interface ICrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser, TInsert, TUpdate>
     : ICrudRepositoryWithPKBase<TPrimaryKeyUser, TInsert, TUpdate>
-    where TPrimaryKeyUser : ReadOnlyPrimaryKeyUser
+    where TPrimaryKeyUser : class, IReadOnlyPrimaryKeyUser
 {
     Action<ValidationResult, IValidator<TPrimaryKeyUser>, TPrimaryKeyUser>? getset_handleValidationOnModelFail { get; set; }
     Action<ValidationResult, IValidator<TInsert>, TInsert>? getset_handleValidationOnInsertFail { get; set; }
@@ -26,8 +26,8 @@ public interface ICrudRepositoryWithPKAndValidationBase<TPrimaryKeyUser, TInsert
 }
 
 public interface ICrudRepositoryWithPKAndMapperAndValidationBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO> : ICrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO>
-    where TPrimaryKeyUserModel : PrivatePrimaryKeyUser
-    where TPrimaryKeyUserDAO : PublicPrimaryKeyUser
+    where TPrimaryKeyUserModel : IPrivatePrimaryKeyUser
+    where TPrimaryKeyUserDAO : class, IPublicPrimaryKeyUser
 {
     Action<ValidationResult, IValidator<TPrimaryKeyUserModel>, TPrimaryKeyUserModel>? getset_handleValidationOnModelFail { get; set; }
     Action<ValidationResult, IValidator<TPrimaryKeyUserDAO>, TPrimaryKeyUserDAO>? getset_handleValidationOnDaoFail { get; set; }
@@ -36,10 +36,23 @@ public interface ICrudRepositoryWithPKAndMapperAndValidationBase<TPrimaryKeyUser
     void Update(TPrimaryKeyUserModel model, IValidator<TPrimaryKeyUserModel>? currentModelValidator = null, IValidator<TPrimaryKeyUserDAO>? currentDaoValidator = null);
 }
 
+public interface ICrudRepositoryWithPKAndMapperAndValidationBase<TPrimaryKeyUserModel, TInsert, TUpdate>
+    : ICrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TInsert, TUpdate>
+    where TPrimaryKeyUserModel : IReadOnlyPrimaryKeyUser
+{
+    Action<ValidationResult, IValidator<TInsert>, TInsert>? getset_handleValidationOnInsertFail { get; set; }
+    Action<ValidationResult, IValidator<TUpdate>, TUpdate>? getset_handleValidationOnUpdateFail { get; set; }
+    Action<ValidationResult, IValidator<TPrimaryKeyUserModel>, TPrimaryKeyUserModel>? getset_handleValidationOnModelFail { get; set; }
+
+    TPrimaryKeyUserModel Insert(TInsert insert, IValidator<TInsert>? currentInsertValidator = null, IValidator<TPrimaryKeyUserModel>? currentModelValidator = null);
+    TPrimaryKeyUserModel? TryInsert(TInsert insert, IValidator<TInsert>? currentInsertValidator = null, IValidator<TPrimaryKeyUserModel>? currentModelValidator = null);
+    void Update(TUpdate update, IValidator<TUpdate>? currentUpdateValidator = null, IValidator<TPrimaryKeyUserModel>? currentModelValidator = null);
+}
+
 public interface ICrudRepositoryWithPKAndMapperAndValidationBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO, TInsert, TUpdate>
     : ICrudRepositoryWithPKAndMapperBase<TPrimaryKeyUserModel, TPrimaryKeyUserDAO, TInsert, TUpdate>
-    where TPrimaryKeyUserModel : PrivatePrimaryKeyUser
-    where TPrimaryKeyUserDAO : PublicPrimaryKeyUser
+    where TPrimaryKeyUserModel : IPrivatePrimaryKeyUser
+    where TPrimaryKeyUserDAO : class, IPublicPrimaryKeyUser
 {
     Action<ValidationResult, IValidator<TInsert>, TInsert>? getset_handleValidationOnInsertFail { get; set; }
     Action<ValidationResult, IValidator<TUpdate>, TUpdate>? getset_handleValidationOnUpdateFail { get; set; }
