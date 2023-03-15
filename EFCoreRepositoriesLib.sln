@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCoreRepositoriesLib.Fluen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCoreRepositoriesLib", "EFCoreRepositoriesLib\EFCoreRepositoriesLib.csproj", "{8A2EAA02-0A91-4911-90FD-BC5C7A69F58C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreRepositoriesLib.Tests.Unit", "EFCoreRepositoriesLib.Tests.Unit\EFCoreRepositoriesLib.Tests.Unit.csproj", "{83A1296B-0E1A-4B5C-A5D6-0ADDCC5B8DB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{8A2EAA02-0A91-4911-90FD-BC5C7A69F58C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A2EAA02-0A91-4911-90FD-BC5C7A69F58C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A2EAA02-0A91-4911-90FD-BC5C7A69F58C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83A1296B-0E1A-4B5C-A5D6-0ADDCC5B8DB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83A1296B-0E1A-4B5C-A5D6-0ADDCC5B8DB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83A1296B-0E1A-4B5C-A5D6-0ADDCC5B8DB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83A1296B-0E1A-4B5C-A5D6-0ADDCC5B8DB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
