@@ -37,7 +37,7 @@ public class RepositoryWithPKBase<TPrimaryKeyUser> : IRepositoryWithPKBase<TPrim
 
     public virtual TPrimaryKeyUser? GetById(int id)
     {
-        return _table.ApplyTransformations(this).First(x => x.ID == id);
+        return _table.ApplyTransformations(this).FirstOrDefault(x => x.ID == id);
     }
 
     public virtual IQueryable<TPrimaryKeyUser> ApplyTransformations(IQueryable<TPrimaryKeyUser> entities) => entities;
